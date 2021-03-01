@@ -4,15 +4,46 @@ using UnityEngine;
 
 public class Tank : MonoBehaviour
 {
-    // Start is called before the first frame update
+
+    private bool initilized = false;
+    private Transform m_hex;
+
+    private NeuralNetwork m_net;
+    private Rigidbody2D m_rBody;
+    private Material[] m_mats;
+
+    //nerual net related
+    private float m_fitness = 0f;
+
+    //tank related
+    public float m_MoveSpeed = 100f;
+
     void Start()
+    {
+        //create rigidbody
+        m_rBody = GetComponent<Rigidbody2D>();
+
+        
+    }
+
+    private void FixedUpdate()
+    {
+          
+
+
+
+        
+    }
+
+    //todo - fix this
+    public void Init(NeuralNetwork net, Transform hex)
+    {
+       
+        initilized = true;
+    }
+    public void OnServerInitialized(NeuralNetwork net, )
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
