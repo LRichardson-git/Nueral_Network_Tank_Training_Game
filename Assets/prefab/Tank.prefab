@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Position: {x: 0, y: 0}
-  m_MoveSpeed: 100
+  m_MoveSpeed: 300
 --- !u!50 &-3827502286764437528
 Rigidbody2D:
   serializedVersion: 4
@@ -148,7 +148,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4831872672598148233}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0

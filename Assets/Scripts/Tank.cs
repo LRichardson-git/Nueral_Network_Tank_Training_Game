@@ -18,11 +18,13 @@ public class Tank : MonoBehaviour
     private float m_Angle = 0f;
     private int m_ammo = 3;
     private int m_Enemy_num;
-    
+    float[] m_LastOutput;
     GameObject mang;
     bool Switch = false;
 
-
+    //wall heights
+    int height = 19;
+    int Wall = 40;
 
     private bool initilized = false;
    
@@ -30,12 +32,12 @@ public class Tank : MonoBehaviour
     private NeuralNetwork m_net;
     private Rigidbody2D m_rBody;
     private Material[] m_mats;
-
+    private Vector3 m_EulerAngleVelocity;
     //nerual net related
     private float m_fitness = 0f;
     
     //tank related
-    public float m_MoveSpeed = 0.0000001f;
+    public float m_MoveSpeed = 0.1f;
 
     void Start()
     {
@@ -48,7 +50,10 @@ public class Tank : MonoBehaviour
             
         
     }
-       
+        
+       // m_rBody.isKinematic = false;
+        m_rBody.gravityScale = 0;
+        
 }
 
     private void FixedUpdate()
@@ -90,72 +95,54 @@ public class Tank : MonoBehaviour
 
             float[] output = m_net.FeedForward(inputs);
 
-            
+
 
             //Movement stops walking into walls and punishes
-
-            
-                if ( output[0] > 0.5) { 
-                    
-                if (transform.position.y > 20)
-                {
-                    m_fitness -= transform.position.y;
-
-                }
-                else
-                {
-                    m_rBody.velocity = m_MoveSpeed * transform.up;
-                }
-            }
-
-                else if (output[0] > 0) {
-                if (transform.position.x > 20)
-                {
-                    m_fitness -= transform.position.x;
-                }
-                else
-                {
-                    m_rBody.velocity = m_MoveSpeed * transform.right;
-                }
-                
-            }
-
-                else if (output[0] > -0.5) {
-
-                if (transform.position.x < 20)
-                {
-                    m_fitness += transform.position.x;
-                }
-                else
-                {
-                    m_rBody.velocity = -m_MoveSpeed * transform.right;
-                }
-                
-            }
-                else {
-
-                if (transform.position.y < -20)
-                {
-
-                    m_fitness += transform.position.y;
-                }
-                else
-                {
-                    m_rBody.velocity = -m_MoveSpeed * transform.up;
-                }
-               
-            }
-
-           
-                if (output[1] > 0)
+            if (transform.position.x >= Wall || transform.position.x <= -Wall || transform.position.y >= height || transform.position.y <= -height)
             {
-                m_Angle--;
+
+                m_fitness--;
+                Debug.Log("Dead");
+                m_rBody.position = startpos;
+                won = false;
             }
-                else
+            //Move forward,backward or not at all
+            else
             {
-                m_Angle++;
+                //forward
+                if (output[0] > 0)
+                {
+
+                    m_rBody.velocity = transform.right * m_MoveSpeed * Time.deltaTime;
+                }
+                //backward
+                else if (output[0] > -0.5)
+                {
+
+                    m_rBody.velocity = transform.right * -m_MoveSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    m_rBody.velocity = transform.right * 0;
+                }
+
             }
 
+
+
+
+            //Rotate tank
+            if (output[1] > 0)
+            {
+                m_rBody.MoveRotation(m_rBody.rotation + 1);
+            }
+                else if (output[1] > -0.5)
+            {
+                m_rBody.MoveRotation(m_rBody.rotation - 1);
+            }
+
+
+            //TODO BULLETS
                 if (output[2] > 0)
             {
                 //Spawn bullet projectile
@@ -183,17 +170,6 @@ public class Tank : MonoBehaviour
                     m_fitness--;
                 }
             }
-
-
-
-
-
-
-
-            
-            
-           
-          
            
 
                if (won == false)
@@ -201,9 +177,12 @@ public class Tank : MonoBehaviour
                 m_fitness -= 100;
             }
 
+                if (m_rBody.position == startpos)
+            {
+                m_fitness -= 10;
+            }
 
 
-            Debug.Log(output[0]);
             m_net.AddFitness(m_fitness);
 
         }

@@ -63,7 +63,7 @@ public class Manager : MonoBehaviour
             m_Generation++;
 
             m_Training = true;
-            Invoke("Timer", 3f);
+            Invoke("Timer", 10f);
             CreateTanks();
             
         }
