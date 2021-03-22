@@ -7,22 +7,30 @@ public class Manager : MonoBehaviour
 
     //variables like training or population size
     public GameObject TankPrefab;
+    public GameObject BUlletPrefab;
 
     public List<Tank> m_TankList = null;
 
     private bool m_Training = false;
     private int m_Population_Size = 50;
     private int m_Generation = 0;
-    private int[] m_Layers = new int[] { 8, 22, 22, 3 };
+    private int[] m_Layers = new int[] { 8, 22, 22, 4 };
     private List<NeuralNetwork> m_Nets;
     private bool m_Bullet_shot = false;
-   
 
+    GameObject[] Gameobjs;
     
     //reset training after certain amount of time passes
     void Timer()
     {
         m_Training = false;
+        foreach (GameObject g in FindObjectsOfType(typeof(GameObject)))
+        {
+            if (g.layer == 10)
+            {
+                Object.Destroy(g);
+            }
+        }
     }
 
     private void Update()
@@ -94,27 +102,27 @@ public class Manager : MonoBehaviour
         {
             
             int Enemy = 1;
-            Vector3 lol;
-            lol = new Vector3(-10f, 0f);
+            Vector3 Pos;
+            Pos = new Vector3(-10f, 0f);
             //set start position and enemy value (odd and even tanks vs each other)
 
             
             if (i % 2 == 0)
             {
                 Enemy = i + 1;
-                lol = new Vector3(-10f, 0f);
+                Pos = new Vector3(-30f, 0f);
             }
             else
             {
                 Enemy = i - 1;
-                lol = new Vector3(10f, 0f);
+                Pos = new Vector3(30f, 0f);
             }
             
 
             //create tank gameobject
            
-            Tank Tanky = ((GameObject)Instantiate(TankPrefab, lol, TankPrefab.transform.rotation)).GetComponent<Tank>();
-            Tanky.Init(m_Nets[i], lol, Enemy);
+            Tank Tanky = ((GameObject)Instantiate(TankPrefab, Pos, TankPrefab.transform.rotation)).GetComponent<Tank>();
+            Tanky.Init(m_Nets[i], Pos, Enemy);
             m_TankList.Add(Tanky);
 
         }
