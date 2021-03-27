@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
 
     private Rigidbody2D m_rbody;
     int m_MoveSpeed = 1000;
+    
+    public GameObject TriggerPrefab;
 
     int m_Enemy;
     float m_Angle = 1f;
@@ -15,7 +17,10 @@ public class Bullet : MonoBehaviour
     Vector3 LastVelocity;
     void Start()
     {
-        
+
+
+        Trigger_Bullet Bulley = ((GameObject)Instantiate(TriggerPrefab, transform.position, TriggerPrefab.transform.rotation)).GetComponent<Trigger_Bullet>();
+        Bulley.init(transform.transform, m_Enemy);
     }
 
     // Update is called once per frame
@@ -32,6 +37,7 @@ public class Bullet : MonoBehaviour
     }
     void Die()
     {
+        
         Object.Destroy(this.gameObject);
     }
 
@@ -46,7 +52,7 @@ public class Bullet : MonoBehaviour
         m_rbody.MoveRotation(m_Angle);
         Vector2 dir = (Vector2)(Quaternion.Euler(0, 0, Angle) * Vector2.right);
         m_rbody.AddForce( dir * m_MoveSpeed);
-        Debug.Log(Angle);
+        //Debug.Log(Angle);
         Invoke("Die", 5f);
 
 
@@ -67,5 +73,13 @@ public class Bullet : MonoBehaviour
        
 
         m_bounces++;
+
+
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        //Debug.Log("test");
     }
 }
+

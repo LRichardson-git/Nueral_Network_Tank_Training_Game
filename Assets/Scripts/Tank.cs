@@ -19,7 +19,7 @@ public class Tank : MonoBehaviour
     private int m_accuracy = 0;
     public float m_Angle = 1f;
     private int m_ammo = 3;
-    private int m_Enemy_num;
+    public int m_Enemy_num;
     float[] m_LastOutput;
     bool m_shoot = true;
     GameObject mang;
@@ -30,7 +30,7 @@ public class Tank : MonoBehaviour
     int Wall = 40;
 
     private bool initilized = false;
-   
+
 
     private NeuralNetwork m_net;
     private Rigidbody2D m_rBody;
@@ -45,6 +45,8 @@ public class Tank : MonoBehaviour
     void Start()
     {
 
+      
+
         Physics2D.IgnoreLayerCollision(9, 10);
         Physics2D.IgnoreLayerCollision(8, 10);
         //create rigidbody
@@ -57,11 +59,11 @@ public class Tank : MonoBehaviour
         
     }
 
-       
 
 
-        
-}
+        m_mats[0].SetColor("_Color", Color.white);
+
+    }
 
     private void FixedUpdate()
     {
@@ -177,7 +179,7 @@ public class Tank : MonoBehaviour
                 {
                     Bullet Bulley = ((GameObject)Instantiate(BulletPrefab, transform.position, BulletPrefab.transform.rotation)).GetComponent<Bullet>();
                     Bulley.init(m_Angle,m_enemy);
-                    Debug.Log(m_ammo);
+                   // Debug.Log(m_ammo);
                     m_ammo = m_ammo - 1;
                     m_shoot = false;
                     Invoke("refresh_ammo", 5f);
@@ -234,20 +236,22 @@ public class Tank : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-       // Debug.Log("hit");
-        m_fitness--;
-
-        if(collision.gameObject.layer == 10 || collision.gameObject.layer == 11)
-        {
-            Destroy(collision.collider.gameObject);
-        }
-        
+        // 
     }
+
 
 
     public void refresh_ammo()
     {
         m_ammo++;
+    }
+
+    public void Hit()
+    {
+        m_fitness -= 100;
+        Debug.Log("hitytt");
+        m_mats[0].SetColor("_Color", Color.magenta);
+        
     }
 
 }

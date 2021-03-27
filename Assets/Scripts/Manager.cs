@@ -12,7 +12,7 @@ public class Manager : MonoBehaviour
     public List<Tank> m_TankList = null;
 
     private bool m_Training = false;
-    private int m_Population_Size = 50;
+    private int m_Population_Size = 2;
     private int m_Generation = 0;
     private int[] m_Layers = new int[] { 8, 22, 22, 4 };
     private List<NeuralNetwork> m_Nets;
@@ -110,7 +110,7 @@ public class Manager : MonoBehaviour
             if (i % 2 == 0)
             {
                 Enemy = i + 1;
-                Pos = new Vector3(-30f, 0f);
+                Pos = new Vector3(20f, 0f);
             }
             else
             {

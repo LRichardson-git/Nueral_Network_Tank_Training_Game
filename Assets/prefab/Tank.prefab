@@ -142,6 +142,8 @@ MonoBehaviour:
   BulletPrefab: {fileID: 5968992693977439306, guid: f8911d74aeee5a041a1df41431f2ebb2,
     type: 3}
   m_Position: {x: 0, y: 0}
+  m_Angle: 1
+  m_Enemy_num: 0
   m_MoveSpeed: 300
 --- !u!50 &-3827502286764437528
 Rigidbody2D:
