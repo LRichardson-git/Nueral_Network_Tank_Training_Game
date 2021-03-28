@@ -33,21 +33,24 @@ public class Trigger_Bullet : MonoBehaviour
         {
             m_Enemy = enemy - 1;
         }
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.transform.name == "Tank(Clone)")
         {
-            Debug.Log("working");
-            if(collision.gameObject.GetComponent<Tank>().m_Enemy_num == m_Enemy)
+            //Debug.Log("working");
+            if(collision.gameObject.GetComponent<Tank>().m_enemy == m_Enemy)
             {
+                transform.parent.GetComponent<Bullet>().hit();
                 collision.gameObject.GetComponent<Tank>().Hit();
+                
             }
             
         }
 
-        Debug.Log(collision.transform.name);
+       // Debug.Log(collision.transform.name);
 
         
     }

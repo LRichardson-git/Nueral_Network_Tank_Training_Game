@@ -105,6 +105,7 @@ GameObject:
   - component: {fileID: 8054851852080035750}
   - component: {fileID: -3827502286764437528}
   - component: {fileID: -3052412468091900828}
+  - component: {fileID: -379093570719648250}
   m_Layer: 8
   m_Name: Tank
   m_TagString: Untagged
@@ -141,9 +142,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BulletPrefab: {fileID: 5968992693977439306, guid: f8911d74aeee5a041a1df41431f2ebb2,
     type: 3}
+  m_Enemy_tank: {fileID: 0}
+  m_arrow: {fileID: 7686461759328986754, guid: 082a082f13ea9bf499d5e6377f41b0a0, type: 3}
+  m_BulletList:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   m_Position: {x: 0, y: 0}
+  m_enemy: 0
   m_Angle: 1
   m_Enemy_num: 0
+  m_bulletnumb: 0
+  initilized: 0
   m_MoveSpeed: 300
 --- !u!50 &-3827502286764437528
 Rigidbody2D:
@@ -192,3 +205,53 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3.2302241, y: 2.1798606}
   m_EdgeRadius: 0
+--- !u!212 &-379093570719648250
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4831872672598148233}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 10
+  m_Sprite: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 0
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0

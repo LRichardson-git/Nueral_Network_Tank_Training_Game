@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
+using UnityEngine;
 public class NeuralNetwork : IComparable<NeuralNetwork>
 {
 
@@ -103,11 +103,13 @@ public NeuralNetwork(int[] layers)
     //Feedforward network with given input array
     public float[] FeedForward(float[] inputs)
     {
-
+        
         ////here we will iterate through OUR imputs and put them into the neruon matrix
         for (int i = 0; i < inputs.Length; i++)
         {
             //0 = first layer , i = current neuron
+            
+
             m_neurons[0][i] = inputs[i];
         }
 

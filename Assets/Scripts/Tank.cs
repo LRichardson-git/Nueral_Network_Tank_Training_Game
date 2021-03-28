@@ -8,13 +8,16 @@ public class Tank : MonoBehaviour
     //gameplay data
 
     public GameObject BulletPrefab;
-
+    public Tank m_Enemy_tank;
+    public GameObject m_arrow;
+   
+    public float[] m_BulletList = new float[6] ;
     public Vector2 m_Position;
-    private int m_enemy = 0;
+    public int m_enemy = 0;
     private Vector2 m_Enemy_pos;
     Vector3 startpos;
     private int m_enemy_accuracy = 0;
-
+    private float m_facing_angle = 0;
     private bool won = false;
     private int m_accuracy = 0;
     public float m_Angle = 1f;
@@ -24,12 +27,12 @@ public class Tank : MonoBehaviour
     bool m_shoot = true;
     GameObject mang;
     bool Switch = false;
-
+    public int m_bulletnumb = 0;
     //wall heights
     int height = 19;
     int Wall = 40;
-
-    private bool initilized = false;
+   
+    public bool initilized = false;
 
 
     private NeuralNetwork m_net;
@@ -44,8 +47,9 @@ public class Tank : MonoBehaviour
 
     void Start()
     {
+        for (int i = 0; i < 6; i++)
+            m_BulletList[i] = 0;
 
-      
 
         Physics2D.IgnoreLayerCollision(9, 10);
         Physics2D.IgnoreLayerCollision(8, 10);
@@ -58,7 +62,9 @@ public class Tank : MonoBehaviour
             
         
     }
-
+        
+        arrow m_Arrow = ((GameObject)Instantiate(m_arrow, transform.position , BulletPrefab.transform.rotation)).GetComponent<arrow>();
+        m_Arrow.init(transform.gameObject);
 
 
         m_mats[0].SetColor("_Color", Color.white);
@@ -67,11 +73,38 @@ public class Tank : MonoBehaviour
 
     private void FixedUpdate()
     {
+        /*
+        switch (m_bulletnumb){
+
+            case 0:
+                for (int i = 0; i < 6; i++)
+                    m_BulletList[i] = 0;
+                break;
+            case 2:
+                for (int i = 2; i < 6; i++)
+                    m_BulletList[i] = 0;
+                break;
+            case 4:
+                for (int i = 4; i < 6; i++)
+                    m_BulletList[i] = 0;
+                break;
+            default:
+                break;
+
+        } 
+        */
+
+        if (m_bulletnumb >= 6)
+            m_bulletnumb = 0;
+
+        
 
         //update enemy position
         if (initilized == true) {
 
             m_Position = transform.position;
+
+            
 
             mang = GameObject.Find("Manager");
             m_Enemy_pos = mang.GetComponent<Manager>().m_TankList[m_enemy].m_Position;
@@ -87,26 +120,41 @@ public class Tank : MonoBehaviour
 
 
 
-            float[] inputs = new float[8];
-            //current position
+            float[] inputs = new float[16];
+            //This tank
             inputs[0] = transform.position.x;
             inputs[1] = transform.position.y;
-            //Gun facing 
-            inputs[2] = m_Angle;
-            inputs[3] = m_accuracy;
+            inputs[2] = m_facing_angle;
+            inputs[3] = m_Angle;
             inputs[4] = m_ammo;
-            inputs[5] = m_Enemy_pos.x;
-            inputs[6] = m_Enemy_pos.y;
-            inputs[7] = m_enemy_accuracy;
+            //enemy Tank
+            inputs[5] = m_Enemy_tank.transform.position.x;
+            inputs[6] = m_Enemy_tank.transform.position.y;
+            inputs[7] = m_Enemy_tank.m_facing_angle;
+            inputs[8] = m_Enemy_tank.m_Angle;
+            inputs[8] = m_Enemy_tank.m_ammo;
+            //bullets_enemy
+            inputs[10] = m_Enemy_tank.m_BulletList[0];
+            inputs[11] = m_Enemy_tank.m_BulletList[1];
+            inputs[12] = m_Enemy_tank.m_BulletList[2];
+            inputs[13] = m_Enemy_tank.m_BulletList[3];
+            inputs[14] = m_Enemy_tank.m_BulletList[4];
+            inputs[15] = m_Enemy_tank.m_BulletList[5];
             
-
-
+            if (m_enemy == 1)
+            {
+                Debug.Log(m_Enemy_tank.transform.position.x);
+                Debug.Log(m_Enemy_tank.transform.position.y);
+                Debug.Log(m_Enemy_tank.m_BulletList[0]);
+                Debug.Log(inputs.Length);
+            }
+            
             float[] output = m_net.FeedForward(inputs);
 
 
 
             //Movement stops walking into walls and punishes
-            if (transform.position.x >= Wall || transform.position.x <= -Wall || transform.position.y >= height - 1.5 || transform.position.y <= -height + 1.5)
+            if (transform.position.x >= Wall -0.2  || transform.position.x <= -Wall + 0.5 || transform.position.y >= height - 1.5 || transform.position.y <= -height + 2)
             {
 
                 m_fitness--;
@@ -143,24 +191,28 @@ public class Tank : MonoBehaviour
             if (output[1] > 0)
             {
                 m_rBody.MoveRotation(m_rBody.rotation + 1);
+                m_facing_angle++;
                 
             }
                 else if (output[1] > -0.5)
             {
                 m_rBody.MoveRotation(m_rBody.rotation - 1);
+                m_facing_angle--;
             }
 
 
             //Aim
 
-            if (output[2] > 0)
+            if (output[2] > 0.25)
             {
                 m_Angle++;
-
+                
             }
-            else if (output[2] > -0.5)
+            else if (output[2] < 0.25 && output[2] > -0.50)
             {
                 m_Angle--;
+                
+                
             }
 
 
@@ -178,11 +230,11 @@ public class Tank : MonoBehaviour
                 if (m_ammo > 0 && m_shoot == true)
                 {
                     Bullet Bulley = ((GameObject)Instantiate(BulletPrefab, transform.position, BulletPrefab.transform.rotation)).GetComponent<Bullet>();
-                    Bulley.init(m_Angle,m_enemy);
+                    Bulley.init(m_Angle,m_enemy,transform.gameObject);
                    // Debug.Log(m_ammo);
                     m_ammo = m_ammo - 1;
                     m_shoot = false;
-                    Invoke("refresh_ammo", 5f);
+                    Invoke("refresh_ammo", 9.1f);
                     Invoke("timer", 3f);
                 }
                 else
@@ -201,6 +253,7 @@ public class Tank : MonoBehaviour
             m_net.AddFitness(m_fitness);
 
         }
+
     }
 
     void timer ()
@@ -232,6 +285,7 @@ public class Tank : MonoBehaviour
             Physics2D.IgnoreLayerCollision(9, 11);
         }
 
+        Debug.Log( m_enemy);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -248,10 +302,20 @@ public class Tank : MonoBehaviour
 
     public void Hit()
     {
-        m_fitness -= 100;
-        Debug.Log("hitytt");
+        m_fitness -= 50;
+        //Debug.Log("hitytt");
         m_mats[0].SetColor("_Color", Color.magenta);
+        initilized = false;
         
+    }
+
+    public void hit_Enemy()
+    {
+        won = true;
+
+        m_mats[0].SetColor("_Color", Color.green);
+
+        m_fitness += 50;
     }
 
 }
