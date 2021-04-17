@@ -7,10 +7,11 @@ public class NeuralNetwork : IComparable<NeuralNetwork>
 
     //dataStructures / arrays
 
-    private int[] m_layers; //layers
-    private float[][] m_neurons; //neuron matix
-    private float[][][] m_weights; //weight matrix
-    private float m_fitness; //fitness of the network
+    public int[] m_layers; //layers
+    public float[][] m_neurons; //neuron matix
+    public float[][][] m_weights; //weight matrix
+    public float m_fitness; //fitness of the network
+    public  float test = 1;
 
 
 //initialize neural netowrk

@@ -2,8 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//saving data
+[System.Serializable]
+public struct SaveData
+{
+    public int GenerationNumber;
+
+    
+    [SerializeField]
+    public List<NetData> NetDataList;
+
+}
+[System.Serializable]
+public struct NetData
+{
+    [SerializeField]
+    public int[] m_layers; //layers
+    public float[][] m_neurons; //neuron matix
+    public float[][][] m_weights; //weight matrix
+    public float m_fitnesss;
+}
+
+
+
+
+
 public class Manager : MonoBehaviour
 {
+
+    public SaveData m_SaveData;
 
     //variables like training or population size
     public GameObject TankPrefab;
@@ -12,11 +39,13 @@ public class Manager : MonoBehaviour
     public List<Tank> m_TankList = null;
 
     private bool m_Training = false;
-    private int m_Population_Size = 20;
+    private int m_Population_Size = 50;
     private int m_Generation = 0;
     private int[] m_Layers = new int[] { 16, 22, 22, 4 };
     private List<NeuralNetwork> m_Nets;
     private bool m_Bullet_shot = false;
+
+    private int saves;
 
     GameObject[] Gameobjs;
     
@@ -31,11 +60,28 @@ public class Manager : MonoBehaviour
                 Object.Destroy(g);
             }
         }
+
+        
     }
+
+   
+
+
 
     private void Update()
     {
-        
+        //move these
+        if (Input.GetKeyDown("s"))
+        {
+            Save();
+        }
+
+        if (Input.GetKeyDown("l"))
+        {
+            Load();
+        }
+
+
         if (m_Training == false)
         {
             //only happens once
@@ -76,7 +122,15 @@ public class Manager : MonoBehaviour
             
         }
 
-       //Todo - UPdate information that the manager will have acces to e.g positions and stuff or maybe we handle that in tanks
+
+
+
+       //save after 100 generations or press S
+
+        if( m_Generation >= 100 + saves)
+        {
+                Save();
+        }
 
 
     }
@@ -146,6 +200,9 @@ public class Manager : MonoBehaviour
 
     void InitTankNeuralNetworks()
     {
+
+        var data = JsonUtility.ToJson(m_Population_Size);
+        
         //population must be even, just setting it to 20 incase it's not
         if (m_Population_Size % 2 != 0)
         {
@@ -162,6 +219,52 @@ public class Manager : MonoBehaviour
             m_Nets.Add(net);
         }
     }
+
+    public void Save()
+    {
+        Debug.Log("save");
+        saves += 100;
+        m_SaveData.GenerationNumber = m_Generation;
+
+        //if(m_SaveData.NetDataList == null)
+            m_SaveData.NetDataList = new List<NetData>();
+
+       ///m_SaveData.NetDataList.RemoveAll(tag => tag.m_fitnesss == NetDataList)
+
+        for (int i = 0; i < m_Population_Size; i++) {
+            var netdata = new NetData() { m_fitnesss = m_Nets[i].m_fitness, m_layers = m_Nets[i].m_layers, m_neurons = m_Nets[i].m_neurons, m_weights = m_Nets[i].m_weights };
+
+
+            m_SaveData.NetDataList.Add(netdata);
+    }
+
+        //m_Nets[i + (m_Population_Size / 2)] = new NeuralNetwork(m_Nets[i + (m_Population_Size / 2)]);
+
+        var data = JsonUtility.ToJson(m_SaveData);
+        PlayerPrefs.SetString("SaveData", data);
+        JsonUtility.ToJson(data);
+
+    }
+
+    public void Load()
+    {
+
+        Debug.Log("load");
+        var data = PlayerPrefs.GetString("SaveData");
+        m_SaveData = JsonUtility.FromJson<SaveData>(data);
+        //CancelInvoke();
+       // m_Nets = m_SaveData.NetDataList;
+        Debug.Log(m_SaveData.GenerationNumber);
+       // if(m_SaveData.NetDataList.
+
+        Debug.Log(m_SaveData.NetDataList[0].m_fitnesss);
+        //Timer();
+
+
+        
+    }
+
+
 }
 
 
@@ -169,6 +272,10 @@ public class Manager : MonoBehaviour
 
 
 
+// TODO -- comment everthing
+// get permanent save data
+//run testing
+//setup playing vs best perfoming AI
 
 
 

@@ -143,10 +143,10 @@ public class Tank : MonoBehaviour
             
             if (m_enemy == 1)
             {
-                Debug.Log(m_Enemy_tank.transform.position.x);
-                Debug.Log(m_Enemy_tank.transform.position.y);
-                Debug.Log(m_Enemy_tank.m_BulletList[0]);
-                Debug.Log(inputs.Length);
+                //Debug.Log(m_Enemy_tank.transform.position.x);
+               // Debug.Log(m_Enemy_tank.transform.position.y);
+                //Debug.Log(m_Enemy_tank.m_BulletList[0]);
+               // Debug.Log(inputs.Length);
             }
             
             float[] output = m_net.FeedForward(inputs);
@@ -250,7 +250,7 @@ public class Tank : MonoBehaviour
             }
 
 
-            m_net.AddFitness(m_fitness);
+            m_net.SetFitness(m_fitness);
 
         }
 
