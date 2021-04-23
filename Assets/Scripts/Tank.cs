@@ -30,6 +30,8 @@ public class Tank : MonoBehaviour
     //Neural network related
     public float[] m_BulletList = new float[6];
     private NeuralNetwork m_net;
+    //nets on right side of screen
+    
     private float m_fitness = 0f;
     Vector3 Starpos;
 
@@ -75,11 +77,15 @@ public class Tank : MonoBehaviour
         arrow ArrowPrefab = ((GameObject)Instantiate(m_ArrowPrefab, transform.position , transform.rotation)).GetComponent<arrow>();
         ArrowPrefab.init(transform.gameObject, m_Enemy_tank);
 
-   
-        m_mats[0].SetColor("_Color", Color.white);
+        //if (m_net.best == false)
+        //m_mats[0].SetColor("_Color", Color.white);
+        
+
         Starpos = transform.position;
 
     }
+
+    
 
     private void FixedUpdate()
     {
@@ -88,12 +94,16 @@ public class Tank : MonoBehaviour
         if (m_bulletnumb >= 6)
             m_bulletnumb = 0;
 
-       
+        
 
-  
+
         if (initilized == true) {
 
-           
+
+            if (m_net.best == true)
+            {
+                m_mats[0].SetColor("_Color", Color.cyan);
+            }
             //Create Iputs for neural netowrk
 
             float[] inputs = new float[18];
@@ -249,6 +259,9 @@ public class Tank : MonoBehaviour
             }
             //Set neurel net fitness to tank fitness
             m_net.SetFitness(m_fitness);
+
+                
+            
             }
         }
 
@@ -288,6 +301,8 @@ public class Tank : MonoBehaviour
         moveB = false;
     }
 
+    
+
 
     public void Init(NeuralNetwork net,Vector3 sTartpos, int Enemy)
     {
@@ -315,7 +330,14 @@ public class Tank : MonoBehaviour
             
         }
 
+        
+
+
         initilized = true;
+
+        
+
+
     }
 
     public void refresh_ammo()

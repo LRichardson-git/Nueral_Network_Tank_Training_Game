@@ -11,7 +11,7 @@ public class NeuralNetwork : IComparable<NeuralNetwork>
     public float[][] m_neurons; //neuron matix
     public float[][][] m_weights; //weight matrix
     public float m_fitness; //fitness of the network
-    
+    public bool best = false;
 
 
 //initialize neural netowrk

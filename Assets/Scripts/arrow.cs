@@ -35,7 +35,7 @@ public class arrow : MonoBehaviour
         {
             m_Parent.GetComponent<Tank>().addFitness(20);
             accurate = true;
-            Invoke("resetaccurate", 5f);
+            Invoke("resetaccurate", 2f);
         }
 
     }
