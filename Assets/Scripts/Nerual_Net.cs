@@ -11,7 +11,7 @@ public class NeuralNetwork : IComparable<NeuralNetwork>
     public float[][] m_neurons; //neuron matix
     public float[][][] m_weights; //weight matrix
     public float m_fitness; //fitness of the network
-    public  float test = 1;
+    
 
 
 //initialize neural netowrk
@@ -66,6 +66,7 @@ public NeuralNetwork(int[] layers)
         // we start with the hidden layer (index 1) 
         for (int i = 1; i < m_layers.Length; i++)
         {
+
             //each layer will need its own weight matrix for its neuron
             //neurons connect to many neurons in the previous layer so we need a weight list for the previous layer and the current one since we start with the hidden layer
             //so we use the float array in the list for the previous connections between the current neuron and the previous ones

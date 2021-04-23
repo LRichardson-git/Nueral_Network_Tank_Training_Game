@@ -5,29 +5,50 @@ using UnityEngine;
 public class arrow : MonoBehaviour
 {
 
+    //References to objects
+    Tank Enemy;
     private Rigidbody2D m_rBody;
     GameObject m_Parent;
-    // Start is called before the first frame update
+
+    //currect accuracy
+    float dot;
+    bool accurate = false;
+
     void Start()
     {
         m_rBody = GetComponent<Rigidbody2D>();
-
+        Invoke("Timer", 30f);
     }
 
-    // Update is called once per frame
     void Update()
     {
+        //Set rotation and location based on parent tank
         Vector3 pos = new Vector3(0f, 0f, -5f);
         m_rBody.MoveRotation(m_Parent.GetComponent<Tank>().m_Angle);
         transform.position = m_Parent.transform.position + pos;
 
-        Invoke("Timer", 15f);
+        //Caluculate accuracy (if looking at enemy)
+        dot = Vector3.Dot(transform.right, (Enemy.transform.position - transform.position).normalized);
+        m_Parent.GetComponent<Tank>().arrowUpdate(dot);
+
+        if (dot > 0.95 && accurate == false)
+        {
+            m_Parent.GetComponent<Tank>().addFitness(20);
+            accurate = true;
+            Invoke("resetaccurate", 5f);
+        }
 
     }
 
-    public void init(GameObject parent)
+    void resetaccurate ()
     {
-       m_Parent = parent;
+        accurate = false;
+    }
+
+    public void init(GameObject parent, Tank Enemy_Tank)
+    {
+        m_Parent = parent;
+        Enemy = Enemy_Tank;
     }
 
     private void Timer()

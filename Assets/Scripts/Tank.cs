@@ -5,163 +5,151 @@ using UnityEngine;
 public class Tank : MonoBehaviour
 {
 
-    //gameplay data
-
-    public GameObject BulletPrefab;
-    public Tank m_Enemy_tank;
-    public GameObject m_arrow;
    
-    public float[] m_BulletList = new float[6] ;
-    public Vector2 m_Position;
+    //Prefabs for creation in game
+    public GameObject m_BulletPrefab;
+    public GameObject m_ArrowPrefab;
+
+    //Reference to opponent tank in simulation
+    public Tank m_Enemy_tank;
+
+    //Gameplay Related
     public int m_enemy = 0;
-    private Vector2 m_Enemy_pos;
-    Vector3 startpos;
-    private int m_enemy_accuracy = 0;
-    private float m_facing_angle = 0;
-    private bool won = false;
-    private int m_accuracy = 0;
     public float m_Angle = 1f;
+    private float m_accuracy = 0;
     private int m_ammo = 3;
     public int m_Enemy_num;
-    float[] m_LastOutput;
     bool m_shoot = true;
-    GameObject mang;
-    bool Switch = false;
     public int m_bulletnumb = 0;
+    public bool initilized = false;
+    public float m_MoveSpeed = 0.1f;
+    private bool wallB = false;
+    private bool moveB = false;
+    private bool canwin = true;
+
+    //Neural network related
+    public float[] m_BulletList = new float[6];
+    private NeuralNetwork m_net;
+    private float m_fitness = 0f;
+    Vector3 Starpos;
+
+    //Enemy Tank variables
+    private float m_enemy_accuracy = 0;
+    private float m_facing_angle = 0;
+    private bool won = false;
+    
+  
     //wall heights
     int height = 19;
     int Wall = 40;
    
-    public bool initilized = false;
-
-
-    private NeuralNetwork m_net;
+    //Bodyrelated
     private Rigidbody2D m_rBody;
     private Material[] m_mats;
-    private Vector3 m_EulerAngleVelocity;
-    //nerual net related
-    private float m_fitness = 0f;
-    
-    //tank related
-    public float m_MoveSpeed = 0.1f;
+
+
 
     void Start()
     {
+        //uniinitlze self so related bodies will kill self
+        Invoke("dead", 30f);
+
+        //Create and fill bullet list
         for (int i = 0; i < 6; i++)
             m_BulletList[i] = 0;
 
-
+        //Ignorecollisions with own bullets
         Physics2D.IgnoreLayerCollision(9, 10);
         Physics2D.IgnoreLayerCollision(8, 10);
+
         //create rigidbody
         m_rBody = GetComponent<Rigidbody2D>();
         m_mats = new Material[transform.childCount];
        
         for (int i = 0; i < m_mats.Length; i++) { 
-            m_mats[i] = transform.GetChild(i).GetComponent<Renderer>().material;
-            
+            m_mats[i] = transform.GetChild(i).GetComponent<Renderer>().material; 
         
     }
         
-        arrow m_Arrow = ((GameObject)Instantiate(m_arrow, transform.position , BulletPrefab.transform.rotation)).GetComponent<arrow>();
-        m_Arrow.init(transform.gameObject);
+        //Create Arrow (red arrow where you see direction aiming)
+        arrow ArrowPrefab = ((GameObject)Instantiate(m_ArrowPrefab, transform.position , transform.rotation)).GetComponent<arrow>();
+        ArrowPrefab.init(transform.gameObject, m_Enemy_tank);
 
-
+   
         m_mats[0].SetColor("_Color", Color.white);
+        Starpos = transform.position;
 
     }
 
     private void FixedUpdate()
     {
-        /*
-        switch (m_bulletnumb){
-
-            case 0:
-                for (int i = 0; i < 6; i++)
-                    m_BulletList[i] = 0;
-                break;
-            case 2:
-                for (int i = 2; i < 6; i++)
-                    m_BulletList[i] = 0;
-                break;
-            case 4:
-                for (int i = 4; i < 6; i++)
-                    m_BulletList[i] = 0;
-                break;
-            default:
-                break;
-
-        } 
-        */
-
+       
+        //Reset counting of bullets
         if (m_bulletnumb >= 6)
             m_bulletnumb = 0;
 
-        
+       
 
-        //update enemy position
+  
         if (initilized == true) {
 
-            m_Position = transform.position;
+           
+            //Create Iputs for neural netowrk
 
-            
+            float[] inputs = new float[18];
 
-            mang = GameObject.Find("Manager");
-            m_Enemy_pos = mang.GetComponent<Manager>().m_TankList[m_enemy].m_Position;
-
-            //x and y values to go in
-            float e_x = m_Enemy_pos.x;
-            float e_y = m_Enemy_pos.y;
-
-            //TODO -add bullets and accuracy
-
-            //update likelyhood of being hit and likelyhood to hit opponent
-            m_enemy_accuracy = mang.GetComponent<Manager>().m_TankList[m_enemy].m_accuracy;
-
-
-
-            float[] inputs = new float[16];
             //This tank
             inputs[0] = transform.position.x;
             inputs[1] = transform.position.y;
             inputs[2] = m_facing_angle;
             inputs[3] = m_Angle;
             inputs[4] = m_ammo;
+
             //enemy Tank
             inputs[5] = m_Enemy_tank.transform.position.x;
             inputs[6] = m_Enemy_tank.transform.position.y;
             inputs[7] = m_Enemy_tank.m_facing_angle;
             inputs[8] = m_Enemy_tank.m_Angle;
             inputs[8] = m_Enemy_tank.m_ammo;
-            //bullets_enemy
+
+            //bullets_enemy_possitions
             inputs[10] = m_Enemy_tank.m_BulletList[0];
             inputs[11] = m_Enemy_tank.m_BulletList[1];
             inputs[12] = m_Enemy_tank.m_BulletList[2];
             inputs[13] = m_Enemy_tank.m_BulletList[3];
             inputs[14] = m_Enemy_tank.m_BulletList[4];
             inputs[15] = m_Enemy_tank.m_BulletList[5];
+
+            //Current accuracy vs Enemy accury
+            inputs[16] = m_accuracy;
+            inputs[17] = m_enemy_accuracy;
+
             
-            if (m_enemy == 1)
+           
+
+
+
+            //put all inputs into feed forward
+            if (m_net != null)
             {
-                //Debug.Log(m_Enemy_tank.transform.position.x);
-               // Debug.Log(m_Enemy_tank.transform.position.y);
-                //Debug.Log(m_Enemy_tank.m_BulletList[0]);
-               // Debug.Log(inputs.Length);
-            }
+                float[] output = m_net.FeedForward(inputs);
             
-            float[] output = m_net.FeedForward(inputs);
+            
 
 
 
-            //Movement stops walking into walls and punishes
+            //punish if walk into walls
             if (transform.position.x >= Wall -0.2  || transform.position.x <= -Wall + 0.5 || transform.position.y >= height - 1.5 || transform.position.y <= -height + 2)
             {
+                if (wallB == false) { 
+                    m_fitness -= 10;
+                    Invoke("Wallreset", 5f);
+                        wallB = true;
+                    }
 
-                m_fitness--;
-                //Debug.Log("Dead");
-                m_rBody.position = startpos;
-                won = false;
-            }
+
+                }
+
             //Move forward,backward or not at all
             else
             {
@@ -170,24 +158,47 @@ public class Tank : MonoBehaviour
                 {
 
                     m_rBody.velocity = transform.right * m_MoveSpeed * Time.deltaTime;
-                }
+
+                        if (moveB == false)
+                        {
+                            m_fitness += 10;
+                            moveB = true;
+                            Invoke("movee", 5f);
+                        }
+
+
+                    }
                 //backward
                 else if (output[0] > -0.5)
                 {
 
                     m_rBody.velocity = transform.right * -m_MoveSpeed * Time.deltaTime;
-                }
+
+                        if (moveB == false)
+                        {
+                            m_fitness += 7;
+                            moveB = true;
+                            Invoke("movee", 5f);
+                        }
+                    }
                 else
                 {
                     m_rBody.velocity = transform.right * 0;
-                }
+
+                        if (moveB == false)
+                        {
+                            m_fitness += 4;
+                            moveB = true;
+                            Invoke("movee", 5f);
+                        }
+                    }
 
             }
             
 
 
 
-            //Rotate tank
+            //Rotate tank or dont rotate
             if (output[1] > 0)
             {
                 m_rBody.MoveRotation(m_rBody.rotation + 1);
@@ -201,8 +212,7 @@ public class Tank : MonoBehaviour
             }
 
 
-            //Aim
-
+            //Change direction of aim or dont at all
             if (output[2] > 0.25)
             {
                 m_Angle++;
@@ -216,84 +226,97 @@ public class Tank : MonoBehaviour
             }
 
 
-
-
-
-
-
-
-            //TODO BULLETS
+            //Shoot or not to shoot
             if (output[3] > 0)
             {
 
                 //Spawn bullet projectile
                 if (m_ammo > 0 && m_shoot == true)
                 {
-                    Bullet Bulley = ((GameObject)Instantiate(BulletPrefab, transform.position, BulletPrefab.transform.rotation)).GetComponent<Bullet>();
+                    //Spawn bullet
+                    Bullet Bulley = ((GameObject)Instantiate(m_BulletPrefab, transform.position, m_BulletPrefab.transform.rotation)).GetComponent<Bullet>();
                     Bulley.init(m_Angle,m_enemy,transform.gameObject);
-                   // Debug.Log(m_ammo);
+
+                   //Change ammo
                     m_ammo = m_ammo - 1;
                     m_shoot = false;
+
+                    //Timers for ammo refresh
                     Invoke("refresh_ammo", 9.1f);
                     Invoke("timer", 3f);
-                }
-                else
-                {
 
                 }
             }
-           
-
-               if (won == false)
-            {
-                m_fitness -= 100;
-            }
-
-
+            //Set neurel net fitness to tank fitness
             m_net.SetFitness(m_fitness);
-
+            }
         }
 
     }
 
     void timer ()
     {
-        m_shoot = true;
+        m_shoot = true;        
+        if (Starpos == transform.position)
+        {
+            m_fitness -= 20;
+        }
     }
 
-    //todo - fix this
+    void Wallreset()
+    {
+        wallB = false;
+    }
+
+    public void addFitness(int fit)
+    {
+        m_fitness += fit;
+    }
+
+    void dead()
+    {
+        if (won == true)
+            m_fitness += 120;
+
+        initilized = false;
+        m_net.SetFitness(m_fitness);
+        //Debug.Log(m_fitness);
+    }
+
+    void movee()
+    {
+        moveB = false;
+    }
+
+
     public void Init(NeuralNetwork net,Vector3 sTartpos, int Enemy)
     {
         m_enemy = Enemy;
-        startpos = sTartpos;
-        this.m_net = net;
+        
+        m_net = net;
 
-        initilized = true;
+        
 
-
-
+        //Set defaults based on wheather or not is on left side or right side of screen
         if (m_enemy % 2 == 0)
         {
             transform.gameObject.layer = 8;
+            Physics2D.IgnoreLayerCollision(8, 9);
             Physics2D.IgnoreLayerCollision(8, 8);
             Physics2D.IgnoreLayerCollision(8, 10);
+            m_Angle = 180;
         }
         else
         {
             transform.gameObject.layer = 9;
+            Physics2D.IgnoreLayerCollision(9, 8);
             Physics2D.IgnoreLayerCollision(9, 9);
             Physics2D.IgnoreLayerCollision(9, 11);
+            
         }
 
-        Debug.Log( m_enemy);
+        initilized = true;
     }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        // 
-    }
-
-
 
     public void refresh_ammo()
     {
@@ -302,20 +325,30 @@ public class Tank : MonoBehaviour
 
     public void Hit()
     {
-        m_fitness -= 50;
-        //Debug.Log("hitytt");
+        m_fitness -= 30;
+      
         m_mats[0].SetColor("_Color", Color.magenta);
-        initilized = false;
-        
+        if (won == false)
+            canwin = false;
+        m_net.SetFitness(m_fitness);
+
     }
 
     public void hit_Enemy()
     {
-        won = true;
+        if (canwin == true) { 
+            won = true;
 
         m_mats[0].SetColor("_Color", Color.green);
+        }
 
-        m_fitness += 50;
+        m_fitness += 60;
+        m_net.SetFitness(m_fitness);
+    }
+
+    public void arrowUpdate(float Accurate)
+    {
+        m_accuracy = Accurate;
     }
 
 }

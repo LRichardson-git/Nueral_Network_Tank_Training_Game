@@ -140,10 +140,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24b702d545f1caf448706ac94f1f90ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BulletPrefab: {fileID: 5968992693977439306, guid: f8911d74aeee5a041a1df41431f2ebb2,
+  m_BulletPrefab: {fileID: 5968992693977439306, guid: f8911d74aeee5a041a1df41431f2ebb2,
+    type: 3}
+  m_ArrowPrefab: {fileID: 7686461759328986754, guid: 082a082f13ea9bf499d5e6377f41b0a0,
     type: 3}
   m_Enemy_tank: {fileID: 0}
-  m_arrow: {fileID: 7686461759328986754, guid: 082a082f13ea9bf499d5e6377f41b0a0, type: 3}
   m_BulletList:
   - 0
   - 0
