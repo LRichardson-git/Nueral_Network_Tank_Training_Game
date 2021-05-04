@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\Tank.cs" />
     <Compile Include="Assets\Scripts\Trigger_Bullet.cs" />
     <Compile Include="Assets\Scripts\arrow.cs" />
+    <Compile Include="Assets\Scripts\direction.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.18f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

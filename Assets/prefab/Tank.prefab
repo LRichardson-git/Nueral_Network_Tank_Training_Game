@@ -144,7 +144,18 @@ MonoBehaviour:
     type: 3}
   m_ArrowPrefab: {fileID: 7686461759328986754, guid: 082a082f13ea9bf499d5e6377f41b0a0,
     type: 3}
+  m_directionPreab: {fileID: 7109661859263766505, guid: ae8f4dea271419f4abfd9c28c3f3fa74,
+    type: 3}
+  m_directionBulletPreab: {fileID: 7109661859263766505, guid: ae8f4dea271419f4abfd9c28c3f3fa74,
+    type: 3}
   m_Enemy_tank: {fileID: 0}
+  m_enemy: 0
+  m_Angle: 1
+  m_Enemy_num: 0
+  m_bulletnumb: 0
+  initilized: 0
+  m_MoveSpeed: 300
+  m_angle_arrow: 0
   m_BulletList:
   - 0
   - 0
@@ -152,13 +163,12 @@ MonoBehaviour:
   - 0
   - 0
   - 0
-  m_Position: {x: 0, y: 0}
-  m_enemy: 0
-  m_Angle: 1
-  m_Enemy_num: 0
-  m_bulletnumb: 0
-  initilized: 0
-  m_MoveSpeed: 300
+  m_Enemy_angle: 0
+  dotc: 0
+  m_BulletPos: {x: 0, y: 0, z: 0}
+  BulletY: 0
+  bulletA: 0
+  m_facing_angle: 0
 --- !u!50 &-3827502286764437528
 Rigidbody2D:
   serializedVersion: 4

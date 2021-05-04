@@ -29,14 +29,14 @@ public class arrow : MonoBehaviour
 
         //Caluculate accuracy (if looking at enemy)
         dot = Vector3.Dot(transform.right, (Enemy.transform.position - transform.position).normalized);
-        m_Parent.GetComponent<Tank>().arrowUpdate(dot);
 
-        if (dot > 0.95 && accurate == false)
-        {
-            m_Parent.GetComponent<Tank>().addFitness(20);
-            accurate = true;
-            Invoke("resetaccurate", 2f);
-        }
+        
+
+        //update the information at the parent tank
+        m_Parent.GetComponent<Tank>().arrowUpdate(dot);
+        m_Parent.GetComponent<Tank>().m_angle_arrow = transform.rotation.eulerAngles.z;
+
+ 
 
     }
 

@@ -14,7 +14,7 @@ public class Bullet : MonoBehaviour
     int i = 0;
     int m_Enemy;
     float m_Angle = 1f;
-    int m_bounces = 0;
+    int m_bounces = 2;
     Vector3 LastVelocity;
 
     //messages to send back to parent
@@ -26,6 +26,10 @@ public class Bullet : MonoBehaviour
         //spawn hitbox (had trouble and this seemed to work)
         Trigger_Bullet Bulley = ((GameObject)Instantiate(TriggerPrefab, transform.position, TriggerPrefab.transform.rotation)).GetComponent<Trigger_Bullet>();
         Bulley.init(transform.transform, m_Enemy);
+        m_Parent.GetComponent<Tank>().BulletY = true;
+
+        
+
     }
 
 
@@ -41,27 +45,38 @@ public class Bullet : MonoBehaviour
         }
 
         //Die if tank dies
-        if (m_Parent.GetComponent<Tank>().initilized == false)
+        if (m_Parent.GetComponent<Tank>().initilized == false || m_Parent == null) 
         {
+            
             Die();
         }
+
+
+
 
         //Send information on location
         if(m_send == true)
         {
-            m_Parent.GetComponent<Tank>().m_BulletList[i] = transform.position.x;
-            m_Parent.GetComponent<Tank>().m_BulletList[i + 1] = transform.position.y;
+            //send position to parent
+            m_Parent.GetComponent<Tank>().m_BulletPos = transform.position;
         }
 
-        
+       
+
+
     }
     void Die()
     {
         //Killself and reset data in bulletlist of parent 
+        m_Parent.GetComponent<Tank>().BulletY = false;
         m_send = false;
         m_Parent.GetComponent<Tank>().m_BulletList[i] = 0;
         m_Parent.GetComponent<Tank>().m_BulletList[i + 1] = 0;
+        m_Parent.GetComponent<Tank>().dotc -= 2;
+        m_Parent.GetComponent<Tank>().BulletY = false;
         Object.Destroy(this.gameObject);
+
+
 
         
     }
@@ -80,7 +95,7 @@ public class Bullet : MonoBehaviour
         m_rbody.AddForce( dir * m_MoveSpeed);
 
         //Die after 7 seconds
-        Invoke("Die", 7f);
+        Invoke("Die", 5f);
 
         //Ignore collisions from basically everything except walls
         Physics2D.IgnoreLayerCollision(10, 8);
@@ -90,14 +105,9 @@ public class Bullet : MonoBehaviour
 
         
        
-       //Get which bullet it is
+       //dont think does anything
+       //scared to get rid of it since project pretty much done
        i = Parent.GetComponent<Tank>().m_bulletnumb;
-
-       //Set basic informaiton in bulletlist in parent tank
-       Parent.GetComponent<Tank>().m_BulletList[i] = transform.position.x;
-       Parent.GetComponent<Tank>().m_BulletList[i+1] = transform.position.y;
-
-
        Parent.GetComponent<Tank>().m_bulletnumb += 2;
     }
 

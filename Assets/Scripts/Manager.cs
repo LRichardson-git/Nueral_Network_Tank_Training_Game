@@ -20,19 +20,21 @@ public class Manager : MonoBehaviour
 
     //Data for training and tracking
     private bool m_Training = false;
-    private int m_Population_Size = 150;
+    private int m_Population_Size = 140;
     private int m_Generation = 0;
 
     //Set neurel network paramaters
-    private int[] m_Layers = new int[] { 18, 28, 28, 4 };
+    private int[] m_Layers = new int[] { 35, 22, 20, 18 ,3 };
     private List<NeuralNetwork> m_Nets;
     //Nets on right side of screen
     private List<NeuralNetwork> m_Nets_R;
 
     public List<Tank> m_TankList = null;
-    private int saves;
+    private float saves;
 
-    
+    private bool Player = false;
+    private bool playerStart = false;
+    private bool once = false;
 
     //reset Training
     void Timer()
@@ -46,6 +48,12 @@ public class Manager : MonoBehaviour
             }
         }
         m_Training = false;
+
+        if (Player == true)
+            playerStart = true;
+
+        if (once == true)
+            once = false;
 
         //Delete all bullets in scene (they tend to be a lot in training cycles)
         
@@ -66,13 +74,32 @@ public class Manager : MonoBehaviour
             Load();
         }
 
+        if (Input.GetKeyDown("p"))
+        {
+            Player = true;
+            playerStart = true;
+            Timer();
+            if (m_TankList != null)
+            {
+                for (int i = 0; i < m_TankList.Count; i++)
+                {
+                    GameObject.Destroy(m_TankList[i].gameObject);
+                }
 
-        if (m_Training == false)
+            }
+            //Load();
+
+        }
+
+        if (playerStart == false) { 
+            if (m_Training == false)
         {
             //only happens once
             if (m_Generation == 0)
             {
                 InitTankNeuralNetworks();
+
+                
             }
 
             //happens every generation
@@ -84,7 +111,6 @@ public class Manager : MonoBehaviour
 
                 m_Nets.Sort();
                 m_Nets_R.Sort();
-                
                 for (int i = 0; i < m_Population_Size / 2; i++)
                 {
                     m_Nets[i].best = false;
@@ -99,32 +125,53 @@ public class Manager : MonoBehaviour
                     //when sorted better perfoming networks end at the lower end of the sort
                     m_Nets[i] = new NeuralNetwork(m_Nets[i + (m_Population_Size / 4)]);
                     m_Nets[i].Mutate();
-                    
+
 
                     //Deepcopy instead of reset function
                     m_Nets[i + (m_Population_Size / 4)] = new NeuralNetwork(m_Nets[i + (m_Population_Size / 4)]);
 
+
                     m_Nets_R[i] = new NeuralNetwork(m_Nets_R[i + (m_Population_Size / 4)]);
+                   // m_Nets_R[i].delta();
                     m_Nets_R[i].Mutate();
 
 
                     //Deepcopy instead of reset function
                     m_Nets_R[i + (m_Population_Size / 4)] = new NeuralNetwork(m_Nets_R[i + (m_Population_Size / 4)]);
-                    
+
+
+
                 }
-                int k = 1;
-                for (int i = 38; i < 55; i++)
+                int k = 2;
+                //create 10 copies of the best perfmoing Net
+                for (int i = 0; i < 10; i++)
                 {
                     
                         m_Nets[i] = new NeuralNetwork(m_Nets[m_Population_Size / 2 - k]);
+
                         m_Nets[i].Mutate();
                         m_Nets_R[i] = new NeuralNetwork(m_Nets_R[m_Population_Size / 2 - k]);
+
                         m_Nets_R[i].Mutate();
-                    k++;
                     
                 }
+                
+                //create 10 copies of the 10 best perfoming nets
+                for (int i = 10; i < 21; i++)
+                {
 
-               
+                    m_Nets[i] = new NeuralNetwork(m_Nets[m_Population_Size / 2 - k]);
+
+                    m_Nets[i].Mutate();
+                    m_Nets_R[i] = new NeuralNetwork(m_Nets_R[m_Population_Size / 2 - k]);
+
+                    m_Nets_R[i].Mutate();
+                     k++;
+
+                }
+
+
+                
                 for (int i = 0; i < m_Population_Size / 2; i++)
                 {
                     
@@ -153,6 +200,54 @@ public class Manager : MonoBehaviour
         if( m_Generation >= 100 + saves)
         {
                 Save();
+        }
+
+
+        }
+
+
+        else
+        {
+
+
+
+            if (once == false) {
+
+                
+
+                if (m_TankList != null)
+                {
+                    for (int i = 0; i < m_TankList.Count; i++)
+                    {
+                        GameObject.Destroy(m_TankList[i].gameObject);
+                    }
+
+                }
+
+
+
+                m_TankList = new List<Tank>();
+
+                Tank Tanky = ((GameObject)Instantiate(TankPrefab, new Vector3(-30f,-10f,0f), TankPrefab.transform.rotation)).GetComponent<Tank>();
+                Tanky.pl = true;
+                Tanky.Init(m_Nets[m_Nets.Count - 1], new Vector3(-30f, -10f, 0f), 1);
+
+                Tank Panky = ((GameObject)Instantiate(TankPrefab, new Vector3(30f, 10f, 0f), TankPrefab.transform.rotation)).GetComponent<Tank>();
+                Panky.player = true;
+                Panky.pl = true;
+                Panky.Init(m_Nets[m_Nets.Count - 2], new Vector3(30f, 10f, 0f), 0);
+                once = true;
+
+                m_TankList.Add(Tanky);
+                m_TankList.Add(Panky);
+
+                Tanky.m_Enemy_tank = Panky;
+                Panky.m_Enemy_tank = Tanky;
+
+                CancelInvoke();
+                Invoke("Timer", 30f);
+                }
+
         }
 
 
@@ -395,6 +490,7 @@ public class Manager : MonoBehaviour
             m_SaveDataJson.Add("Weight_R"+ i, WeightData_R);
 
 
+
         }
         
         //write all of the information to a permanent file (name based on generation)
@@ -417,14 +513,18 @@ public class Manager : MonoBehaviour
        
 
         //Loadfile from path
-        string jsonString = File.ReadAllText(Application.persistentDataPath + "/SaveData1.json");
+        string jsonString = File.ReadAllText(Application.persistentDataPath + "/SaveData7183.json");
 
         //Parse the data into an object
         JSONObject Data = (JSONObject)JSON.Parse(jsonString);
 
         Debug.Log("test Data:");
         Debug.Log(Data["Weight48"].AsArray[0][0][15]);
+        Debug.Log(Data["Weight_R48"].AsArray[0][0][15]);
 
+        float saveDa = Data["GenerationNumber"];
+        saves = Mathf.Floor(saveDa / 100) * 100;
+        m_Generation = Data["GenerationNumber"];
 
         //Transfer Data from file into the nueral netowrk list
         for (int i = 0; i < m_Population_Size /2; i++)
@@ -482,7 +582,7 @@ public class Manager : MonoBehaviour
                     //loop through previous layer since weights are stored for the weight values of the previous neurons to the current
                     for (int v = 0; v < neuronsInPreviousLayer; v++)
                     {
-                        m_Nets_R[i].m_weights[j - 1][k][v] = Data["Weight" + i].AsArray[j - 1][k][v];
+                        m_Nets_R[i].m_weights[j - 1][k][v] = Data["Weight_R" + i].AsArray[j - 1][k][v];
                     }
 
                 }
@@ -492,8 +592,10 @@ public class Manager : MonoBehaviour
         }
 
 
-
-
+        //TODO - MAKE IT SO IT DOSENT SAVE AS MANY TIMES OVER AS generations it has when you load data
+        //add player combat
+        //might have to make deltaweight save between rounds
+        //idk lol
 
 
 
@@ -510,14 +612,5 @@ public class Manager : MonoBehaviour
 
 }
 
-
-  
-
-
-
-// TODO -- comment everthing
-//run testing
-//setup playing vs best perfoming AI
-//more fitneess incentives
 
 
