@@ -36,6 +36,24 @@ public class Manager : MonoBehaviour
     private bool playerStart = false;
     private bool once = false;
 
+    private List<Vector3> Positions;
+
+
+    private void Start()
+    {
+        Vector3 pos1 = new Vector3(-30f, 10f); //tl
+        Vector3 Pos2 = new Vector3(30f, 10f);//tr
+        Vector3 pos3 = new Vector3(-30f, -10f);//bl
+        Vector3 pos4 = new Vector3(30f, -10f);//br
+        Vector3 pos5 = new Vector3(0f, 0f);
+
+        Positions = new List<Vector3>();
+        Positions.Add(pos1);
+        Positions.Add(Pos2);
+        Positions.Add(pos3);
+        Positions.Add(pos4);
+        Positions.Add(pos5);
+    }
     //reset Training
     void Timer()
     {
@@ -187,7 +205,7 @@ public class Manager : MonoBehaviour
 
             //Set timer to reset training
             m_Training = true;
-            Invoke("Timer", 30f);
+            Invoke("Timer", 15f);
             CreateTanks();
             
         }
@@ -245,7 +263,7 @@ public class Manager : MonoBehaviour
                 Panky.m_Enemy_tank = Tanky;
 
                 CancelInvoke();
-                Invoke("Timer", 30f);
+                Invoke("Timer", 15f);
                 }
 
         }
@@ -273,11 +291,29 @@ public class Manager : MonoBehaviour
         m_Nets[m_Population_Size / 2 - 1].best = true;
         m_Nets_R[m_Population_Size / 2 - 1].best = true;
         //default settings
-        Vector3 Pos;
-        Pos = new Vector3(-10f, 0f);
+
         int Enemy = 1;
         int tracker = 1;
         //Create Number of tank objects based on population size
+
+
+        int P = Random.Range(0, 4);
+        Vector3 Pos = Positions[P];
+        int L = Random.Range(0, 4);
+        bool loop = true;
+        while (loop)
+        {
+            if (L != P)
+            {
+                loop = false;
+            }
+            else
+                L = Random.Range(0, 4);
+        }
+        Vector3 Pos2 = Positions[L];
+        Debug.Log(L);
+        Debug.Log(P);
+        
         for (int i = 0; i < m_Population_Size / 2; i++)
         {
 
@@ -287,7 +323,7 @@ public class Manager : MonoBehaviour
                 tracker += 2;
            
 
-           Pos = new Vector3(-30f, -10f);
+           
     
 
             //create tank gameobject
@@ -306,11 +342,11 @@ public class Manager : MonoBehaviour
             Enemy = tracker;
             tracker += 2;
 
-            Pos = new Vector3(30f, 10f);
+            
 
 
             //create tank gameobject
-            Tank Tanky = ((GameObject)Instantiate(TankPrefab, Pos, TankPrefab.transform.rotation)).GetComponent<Tank>();
+            Tank Tanky = ((GameObject)Instantiate(TankPrefab, Pos2, TankPrefab.transform.rotation)).GetComponent<Tank>();
             Tanky.Init(m_Nets_R[i], Pos, Enemy);
 
             //Add to tank list
